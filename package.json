@@ -1,0 +1,18 @@
+{
+  "name": "oilmod1-keyvault-checker",
+  "version": "1.0.0",
+  "description": "CLI to check Azure Keyvault secrets",
+  "main": "keyvault-checker.js",
+  "author": "Ronnie <rhenri@equinor.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
+    "@azure/identity": "^1.2.2",
+    "@azure/keyvault-secrets": "^4.1.0",
+    "@slack/webhook": "^6.0.0",
+    "colors": "^1.4.0",
+    "commander": "^7.0.0",
+    "nodemailer": "^6.4.17"
+  }
+}

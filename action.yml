@@ -1,0 +1,15 @@
+name: 'Azure keyvault checker'
+description: 'Checks Azure Keyvault secrets for expiry / close to expiry'
+inputs:
+  vault:
+    description: 'Name of the keyvault you want to test'
+    required: true
+  notify-via:
+    description: 'Send notification. Can be email or slack. If blank, outputs to console.'
+    required: false
+  to:
+    description: 'Recipient(s). Multiple emails, or a single slack channel / username. Required if notify-via is set'
+    required: false
+runs:
+  using: 'node12'
+  main: 'keyvault-checker.js'
