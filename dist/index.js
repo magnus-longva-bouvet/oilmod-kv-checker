@@ -74,6 +74,9 @@ try {
   if (!options.vault) {
     throw new Error('No vault specified, bailing...');
   }
+  core.info(options.to);
+  core.debug(options.to);
+  core.error(options.to);
 } catch (error) {
   core.setFailed(error.message);
   process.exit(1);
@@ -239,9 +242,6 @@ function sendMail(messages) {
 ${messages.map(m => `<li style="${m.severity === 0 ? 'color: red;' : m.severity === 1 ? 'color: #99cc33;' : ''}">${m.message}</li>`).join('\n')}
 </ul>`
   };
-  if (options.debug) {
-    core.info(JSON.stringify(message))
-  }
   transport.sendMail(message)
     .then(s => {
       console.log('Mail sent', s);
