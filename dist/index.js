@@ -71,7 +71,7 @@ try {
   options.vault = core.getInput('vault') || options.vault;
   options.notifyBy = core.getInput('notify-via') || options.notifyBy;
   options.to = core.getInput('to') || options.to;
-  options.ignoreTags = core.getInput('ignore-tags') ? core.getInput('ignore-tags').join(',') : options.ignoreTags;
+  options.ignoreTags = core.getInput('ignore-tags') ? core.getInput('ignore-tags').split(',') : options.ignoreTags;
   options.debug = options.debug || core.getInput('debug');
   if (!options.vault) {
     throw new Error('No vault specified, bailing...');
