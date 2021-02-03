@@ -25,6 +25,7 @@ const {program} = __nccwpck_require__(5637);
 program.version('0.0.1');
 
 program
+  .option('-d, --debug', 'Print debug info')
   .option('-v, --vault <vaultName>', 'Name of the keyvault to check')
   .option('--notifyBy <slack|email>', 'How to send alerts. Prints to console if blank', '')
   .option('--to <recipient|channel>', 'Where to send alerts (recipient or slack channel). If email, can be multiple values', (val, memo) => [...memo, val], [])
@@ -69,6 +70,7 @@ try {
   options.vault = options.vault || core.getInput('vault');
   options.notifyBy = options.notifyBy || core.getInput('notify-via');
   options.to = options.to || core.getInput('to');
+  options.debug = options.debug || core.getInput('debug');
   if (!options.vault) {
     throw new Error('No vault specified, bailing...');
   }
@@ -85,6 +87,13 @@ let transport;
  * @type IncomingWebhook
  */
 let webhook;
+
+if (options.debug) {
+  Object.keys(options)
+      .forEach(k => {
+        core.info(`::DEBUG:: ${k} equals ${options[k]}`)
+      });
+}
 
 if (options.notifyBy === 'slack') {
   colors.disable();
@@ -230,6 +239,9 @@ function sendMail(messages) {
 ${messages.map(m => `<li style="${m.severity === 0 ? 'color: red;' : m.severity === 1 ? 'color: #99cc33;' : ''}">${m.message}</li>`).join('\n')}
 </ul>`
   };
+  if (options.debug) {
+    core.info(JSON.stringify(message))
+  }
   transport.sendMail(message)
     .then(s => {
       console.log('Mail sent', s);

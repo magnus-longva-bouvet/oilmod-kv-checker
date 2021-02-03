@@ -10,6 +10,9 @@ inputs:
   to:
     description: 'Recipient(s). Multiple emails, or a single slack channel / username. Required if notify-via is set'
     required: false
+  debug:
+    description: 'Run in debug mode'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
