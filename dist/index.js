@@ -27,6 +27,7 @@ program.version('0.0.1');
 program
   .option('-d, --debug', 'Print debug info')
   .option('-v, --vault <vaultName>', 'Name of the keyvault to check')
+  .option('-it, --ignoreTags <tags>', 'If a secrets has any of these tags, they will be ignored', (val, memo) => [...memo, val], [])
   .option('--notifyBy <slack|email>', 'How to send alerts. Prints to console if blank', '')
   .option('--to <recipient|channel>', 'Where to send alerts (recipient or slack channel). If email, can be multiple values', (val, memo) => [...memo, val], [])
 
@@ -70,6 +71,7 @@ try {
   options.vault = core.getInput('vault') || options.vault;
   options.notifyBy = core.getInput('notify-via') || options.notifyBy;
   options.to = core.getInput('to') || options.to;
+  options.ignoreTags = core.getInput('ignore-tags') ? core.getInput('ignore-tags').join(',') : options.ignoreTags;
   options.debug = options.debug || core.getInput('debug');
   if (!options.vault) {
     throw new Error('No vault specified, bailing...');
@@ -87,13 +89,6 @@ let transport;
  * @type IncomingWebhook
  */
 let webhook;
-
-if (options.debug) {
-  Object.keys(options)
-      .forEach(k => {
-        core.info(`::DEBUG:: ${k} equals ${options[k]}`)
-      });
-}
 
 if (options.notifyBy === 'slack') {
   colors.disable();
@@ -116,7 +111,7 @@ if (options.notifyBy === 'slack') {
 
 if (options.notifyBy === 'email') {
   colors.disable();
-  if (!options.to) {
+  if ((options.to || []).length === 0) {
     printError('When setting notifyBy to email, the argument "to" is required.'.error)
     process.exit(1);
   }
@@ -159,6 +154,14 @@ const client = new SecretClient(url, credential);
   try {
     for await (const secretProperties of client.listPropertiesOfSecrets()) {
       const secret = await client.getSecret(secretProperties.name);
+      const ignoreTags = options.ignoreTags;
+      const hasIgnoreTags = Object.keys(secret.properties.tags || {})
+          .filter(t => ignoreTags.includes(t))
+          .length > 0;
+      if (hasIgnoreTags) {
+        console.log('Ignoring', secret.name);
+        continue;
+      }
       const name = secret.name;
       let extra;
       let expiresOn = secret.properties.expiresOn;
