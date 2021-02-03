@@ -67,16 +67,13 @@ const printError = (message) => {
 
 try {
   // `who-to-greet` input defined in action metadata file
-  options.vault = options.vault || core.getInput('vault');
-  options.notifyBy = options.notifyBy || core.getInput('notify-via');
-  options.to = options.to || core.getInput('to');
+  options.vault = core.getInput('vault') || options.vault;
+  options.notifyBy = core.getInput('notify-via') || options.notifyBy;
+  options.to = core.getInput('to') || options.to;
   options.debug = options.debug || core.getInput('debug');
   if (!options.vault) {
     throw new Error('No vault specified, bailing...');
   }
-  core.info(core.getInput('to'));
-  core.debug(core.getInput('to'));
-  core.error(core.getInput('to'));
 } catch (error) {
   core.setFailed(error.message);
   process.exit(1);
