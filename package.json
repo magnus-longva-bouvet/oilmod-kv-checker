@@ -2,7 +2,7 @@
   "name": "oilmod1-keyvault-checker",
   "version": "1.0.0",
   "description": "CLI to check Azure Keyvault secrets",
-  "main": "keyvault-checker.js",
+  "main": "index.js",
   "author": "Ronnie <rhenri@equinor.com>",
   "license": "MIT",
   "dependencies": {
