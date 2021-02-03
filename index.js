@@ -67,9 +67,9 @@ try {
   if (!options.vault) {
     throw new Error('No vault specified, bailing...');
   }
-  core.info(options.to);
-  core.debug(options.to);
-  core.error(options.to);
+  core.info(core.getInput('to'));
+  core.debug(core.getInput('to'));
+  core.error(core.getInput('to'));
 } catch (error) {
   core.setFailed(error.message);
   process.exit(1);
