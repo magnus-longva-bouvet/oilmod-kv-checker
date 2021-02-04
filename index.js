@@ -1,11 +1,11 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
 
 const { DefaultAzureCredential } = require("@azure/identity");
 const { SecretClient } = require("@azure/keyvault-secrets");
 const colors = require('colors');
 const {IncomingWebhook} = require('@slack/webhook');
 const nodemailer = require('nodemailer');
+
 colors.setTheme({
   info: 'magenta',
   help: 'cyan',
@@ -20,6 +20,7 @@ program.version('0.0.1');
 program
   .option('-d, --debug', 'Print debug info')
   .option('-v, --vault <vaultName>', 'Name of the keyvault to check')
+  .option('--onlyDefined', 'Only test secrets which has an expiry date specified. By default, if secret is missing we assume creation date + 1 year')
   .option('-it, --ignoreTags <tags>', 'If a secrets has any of these tags, they will be ignored', (val, memo) => [...memo, val], [])
   .option('--notifyBy <slack|email>', 'How to send alerts. Prints to console if blank', '')
   .option('--to <recipient|channel>', 'Where to send alerts (recipient or slack channel). If email, can be multiple values', (val, memo) => [...memo, val], [])
@@ -60,12 +61,12 @@ const printError = (message) => {
 }
 
 try {
-  // `who-to-greet` input defined in action metadata file
   options.vault = core.getInput('vault') || options.vault;
   options.notifyBy = core.getInput('notify-via') || options.notifyBy;
   options.to = core.getInput('to') || options.to;
   options.ignoreTags = core.getInput('ignore-tags') ? core.getInput('ignore-tags').split(',') : options.ignoreTags;
   options.debug = options.debug || core.getInput('debug');
+  options.onlyDefined = core.getInput('only-defined') || options.onlyDefined;
   if (!options.vault) {
     throw new Error('No vault specified, bailing...');
   }
@@ -162,6 +163,9 @@ const client = new SecretClient(url, credential);
       const now = new Date().getTime();
       const createdOn = secret.properties.createdOn;
       if (!expiresOn) {
+        if (options.onlyDefined) {
+          continue;
+        }
         const year = createdOn.getFullYear() + 1;
         expiresOn = new Date(createdOn.setFullYear(year));
         extra = `[INFO] ${name} has no expiry date set, assuming createdDate + 1 year`.info;

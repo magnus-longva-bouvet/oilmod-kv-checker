@@ -5,6 +5,8 @@ This action takes 3 inputs:
 * vault -> name of the keyvault (required)
 * notify-via -> slack or email. If left blank, output is printed to the console.
 * to -> recipients (slack channel / user or email recipient.) (required if notify-via is set)
+* ignore-tags -> A list of tags that should be ignored if present
+* only-defined -> Only secrets that has an expiration date specified will be checked.
 
 
 #### Ensure you have the required authentication set up in your environment:
@@ -35,6 +37,7 @@ jobs:
           notify-via: email
           to: 'mail@mail.com; mail2@mail.com'
           vault: my-secret-kv-name
+          only-defined: 0
           env:
             AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
             AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}

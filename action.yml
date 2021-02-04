@@ -13,6 +13,9 @@ inputs:
   ignore-tags:
     description: 'Secrets containing these tags are ignored. Comma-separated list.'
     required: false
+  only-defined:
+    description: 'Only test secrets that have an explicit expiration set - otherwise assume created + 1 year.'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
