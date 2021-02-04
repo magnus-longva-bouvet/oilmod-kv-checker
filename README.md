@@ -1,5 +1,8 @@
 # Azure keyvault secret-expiry checker
 
+#### Azure setup
+Follow the steps outlined [here](https://www.npmjs.com/package/@azure/keyvault-secrets#configuring-your-key-vault) to create a service-principal for your vault.
+
 #### Inputs
 This action takes 3 inputs:
 * vault -> name of the keyvault (required)
@@ -21,7 +24,7 @@ env:
 ```
 
 
-#### Example:
+#### Examples:
 ```yaml
 name: Check AZ Keyvault
 on:
@@ -37,13 +40,39 @@ jobs:
           notify-via: email
           to: 'mail@mail.com; mail2@mail.com'
           vault: my-secret-kv-name
-          only-defined: 0
+          ignore-tags: 'ignore_me' # will ignore secrets with the 'ignore_me' tag
           env:
             AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
             AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
             AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
             MAILSERVER_PASSWORD: ${{ secrets.MAILSERVER_PASSWORD }} # Only required if sending email
             MAILSERVER_USER: ${{ secrets.MAILSERVER_USER }} # Only required if sending email
+```
+
+
+```yaml
+name: Check multiple vaults with matrix
+on:
+  schedule:
+    - cron: '0 3 * * *' # nightly tests run at 3 AM UTC
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Check AZ keyvault
+    strategy:
+      matrix:
+        keyvault: ['vault-1', 'vault-2', 'vault-3']
+    steps:
+      - uses: equinor/oilmod-kv-checker
+        with:
+          notify-via: slack
+          to: '#my-alert-channel'
+          vault: ${{ matrix.keyvault }}
+          only-defined: 1 # Only check defined secrets
+          env:
+            AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+            AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+            AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # Only required if notifying via slack
 ```
 
