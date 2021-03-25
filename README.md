@@ -1,7 +1,40 @@
 # Azure keyvault secret-expiry checker
 
 #### Azure setup
-Follow the steps outlined [here](https://www.npmjs.com/package/@azure/keyvault-secrets#configuring-your-key-vault) to create a service-principal for your vault.
+Create a Service Principal:  
+`az ad sp create-for-rbac -n <your-application-name> --skip-assignment`
+
+Which outputs something like:  
+```
+{  
+  "appId": "generated-app-ID",
+  "displayName": "dummy-app-name",
+  "name": "http://dummy-app-name",
+  "password": "random-password",
+  "tenant": "tenant-ID"
+}
+```
+
+Use the returned values as your AZURE_ secrets:
+```
+AZURE_CLIENT_ID="generated-app-ID"
+AZURE_CLIENT_SECRET="random-password"
+AZURE_TENANT_ID="tenant-ID"
+```
+
+Finally, set permissions for your SP:  
+`az keyvault set-policy --name <your-key-vault-name> --spn $AZURE_CLIENT_ID --secret-permissions list`
+
+Or you can use RBAC, in which case the SP will need the "Key Vault Reader" role:  
+```
+az role assignment create
+        --role 21090545-7ca7-4776-b22c-e363652d74d2
+        --assignee-object-id <object_id>
+        --assignee-principal-type ServicePrincipal
+        --scope <scope>
+        --subscription <SUBSCRIPTION_ID>
+```
+(object_id can be retrieved from the Azure portal)
 
 #### Inputs
 This action takes 3 inputs:
@@ -94,5 +127,6 @@ If notifyBy is omitted, warnings are printed to the console:
 ```
 
 
-#### Building :
+#### Building:
+Builds are performed with [@vercel/ncc](https://www.npmjs.com/package/@vercel/ncc):  
 `ncc build index.js --license licenses.txt`
