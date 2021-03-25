@@ -154,21 +154,20 @@ const client = new SecretClient(url, credential);
   const messages = [];
   try {
     for await (const secretProperties of client.listPropertiesOfSecrets()) {
-      const secret = await client.getSecret(secretProperties.name);
       const ignoreTags = options.ignoreTags;
-      const hasIgnoreTags = Object.keys(secret.properties.tags || {})
+      const hasIgnoreTags = Object.keys(secretProperties.tags || {})
           .filter(t => ignoreTags.includes(t))
           .length > 0;
       if (hasIgnoreTags) {
-        console.log('Ignoring', secret.name);
+        console.log('Ignoring', secretProperties.name);
         continue;
       }
-      const name = secret.name;
+      const name = secretProperties.name;
       let extra;
-      let expiresOn = secret.properties.expiresOn;
+      let expiresOn = secretProperties.expiresOn;
       const oneMonth = 1000 * 60 * 60 * 24 * 31;
       const now = new Date().getTime();
-      const createdOn = secret.properties.createdOn;
+      const createdOn = secretProperties.createdOn;
       if (!expiresOn) {
         if (options.onlyDefined) {
           continue;

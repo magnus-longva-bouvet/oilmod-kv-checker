@@ -92,3 +92,7 @@ If notifyBy is omitted, warnings are printed to the console:
 ```shell script
   $ node index.js -v keyvault-name
 ```
+
+
+#### Building :
+`ncc build index.js --license licenses.txt`
