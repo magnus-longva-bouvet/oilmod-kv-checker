@@ -185,7 +185,7 @@ const client = new SecretClient(url, credential);
       } else {
         messages.push({
           severity: 1,
-          message: `[WARN] ${name} from ${vaultName} expires in less than 30 days (${expiresOn})`.warn
+          message: `[WARN] ${name} in ${vaultName} expires in less than 30 days (${expiresOn})`.warn
         })
         if (extra) {
           messages.push({
